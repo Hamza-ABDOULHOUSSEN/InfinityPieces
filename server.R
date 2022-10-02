@@ -3,6 +3,7 @@ library(ggplot2)
 
 shinyServer ( function (input , output ) {
   
+  # Alert bloc for variables
   CreateAlerte <- function(message) {
     return(
       HTML(paste("<div class='alert'> <span class='closebtn' onclick=",'"',"this.parentElement.style.display='none';",'"',
@@ -26,6 +27,34 @@ shinyServer ( function (input , output ) {
     }
     return(HTML(paste(blocM, blocN)))
   })
+  
+  # Creation of data
+  LancerPiece <- function() {
+    return(rbinom(1, 1, 0.5))
+  }
+  
+  Gain <- function(gain_precedent) {
+    X = LancerPiece()
+    if (X == 0) {
+      if (gain_precedent == 0) {
+        return(Gain(1))
+      }
+      else {
+        return(Gain(2*gain_precedent))
+      }
+    }
+    else {
+      return(gain_precedent)
+    }
+  }
+  
+  Tirage <- function(n) {
+    T = c()
+    for (i in 1:n) {
+      T = c(T, Gain(0))
+    }
+    return(T)
+  }
   
   Simulate <- eventReactive(input$go, {
     HTML(paste(
