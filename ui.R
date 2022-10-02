@@ -51,7 +51,6 @@ ui <- shinyUI(dashboardPage(
             
             HTML("<p></p>"),
             
-            
             fluidRow(
               htmlOutput("result"),
             ),
