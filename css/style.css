@@ -28,6 +28,14 @@ p {
   padding: 10px;
 }
 
+.info {
+  font-family: "Georgia", Times, "Times New Roman", serif;
+  font-weight: bold;
+  color: black;
+  font-size: 15px;
+  padding = 0px;
+}
+
 .status {
   display: block;
   font-size: 20px;
