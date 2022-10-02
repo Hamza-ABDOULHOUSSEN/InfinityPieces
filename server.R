@@ -152,8 +152,18 @@ shinyServer ( function (input , output ) {
               box(
                 title = "info", status = "primary", solidHeader = TRUE,
                 collapsible = TRUE,
-                RenderShinyTable(as.data.frame(table(Gain)))
+                RenderShinyTable(as.data.frame(table(Gain))),
+                
+                output$downloadData <- downloadHandler(
+                  filename = function() {
+                    paste("InfinityPieces.csv", sep = "")
+                  },
+                  content = function(file) {
+                    write.csv(as.data.frame(table(Gain)), file, row.names = FALSE)
+                  }
                 )
+                )
+
             )
           )
         }
