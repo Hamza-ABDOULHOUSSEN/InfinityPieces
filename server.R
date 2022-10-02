@@ -56,6 +56,48 @@ shinyServer ( function (input , output ) {
     return(T)
   }
   
+  # Generer la table
+  Generate_row <- function(Gain, Freq) {
+    return(
+      c(
+        '<tr>',
+        '<td>', Gain, '</td>',
+        '<td>', Freq, '</td>'
+      )
+    )
+  }
+  
+  RenderShinyTable <- function(data) {
+    Init = c(
+      '<div class="info">',
+      '<table class="table table-striped">',
+      '<thead class="thead-light">',
+      '<tr>',
+      '<th scope="col">Gain</th>',
+      '<th scope="col">Freq</th>',
+      '</tr>',
+      '</thead>',
+      '<tbody>'
+    )
+    
+    End = c(
+      '</tbody>',
+      '</table>',
+      '</div>'
+    
+    )
+    
+    L = Init
+    
+    ## boucle
+    for (k in 1:nrow(data)) {
+      L = c(L, Generate_row(levels(data[k, "Gain"])[k], data[k, "Freq"]))
+    }
+    
+    L = c(L, End)
+    return(HTML(L))
+  }
+  
   Simulate <- eventReactive(input$go, {
     HTML(paste(
     box(background = "black", width=12,
@@ -74,37 +116,45 @@ shinyServer ( function (input , output ) {
         if (check["N"] == "" && check["M"] == "") {
           
           # Tirage
-          T = Tirage(input$n);
+          Gain = Tirage(input$n);
           couleur = "#F8766D";
           fluidRow(
             tabBox(
               tabPanel(title="Histogramme", 
                  renderPlot({
-                   ggplot() + aes(T) + geom_histogram(fill=couleur) + geom_vline(xintercept = mean(T), colour = couleur, linetype = "longdash") + scale_x_continuous(name="Gain") + scale_y_continuous(name="Proportion")
+                   ggplot() + aes(Gain) + geom_histogram(fill=couleur) + geom_vline(xintercept = mean(Gain), colour = couleur, linetype = "longdash") + scale_x_continuous(name="Gain") + scale_y_continuous(name="Proportion")
                  })
               ),
               tabPanel(title="Boîte à moustache",
                  renderPlot({
-                   ggplot() + aes(T) + geom_boxplot(fill=couleur) + scale_x_continuous(name="Gain") + scale_y_continuous(name="Proportion")
+                   ggplot() + aes(Gain) + geom_boxplot(fill=couleur) + scale_x_continuous(name="Gain") + scale_y_continuous(name="Proportion")
                  })
               )
             ),
             
-            box(
-              title = "info", status = "primary", solidHeader = TRUE,
-              collapsible = TRUE,
-              HTML(
-                paste(
-                  paste('<p class="info">',"moyenne : ", round(mean(T), digits=2) ),
-                  paste("min : ", min(T)),
-                  paste("1er quartile : ", quantile(T, 0.25)),
-                  paste("mediane : ", median(T)),
-                  paste("3eme quartile : ", quantile(T, 0.75)),
-                  paste("max : ", max(T)),
-                  paste("ecart-type :", sqrt(var(T))),
-                  sep="<br>"
+            fluidPage(
+              box(
+                title = "info", status = "primary", solidHeader = TRUE,
+                collapsible = TRUE,
+                HTML(
+                  paste(
+                    paste('<p class="info">',"moyenne : ", round(mean(Gain), digits=2) ),
+                    paste("min : ", min(Gain)),
+                    paste("1er quartile : ", quantile(Gain, 0.25)),
+                    paste("mediane : ", median(Gain)),
+                    paste("3eme quartile : ", quantile(Gain, 0.75)),
+                    paste("max : ", max(Gain)),
+                    paste("ecart-type :", sqrt(var(Gain))),
+                    sep="<br>"
+                  )
+                )),
+              
+              box(
+                title = "info", status = "primary", solidHeader = TRUE,
+                collapsible = TRUE,
+                RenderShinyTable(as.data.frame(table(Gain)))
                 )
-            ))
+            )
           )
         }
         else {
